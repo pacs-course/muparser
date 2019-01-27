@@ -1,5 +1,7 @@
 # CMake based on work from @xantares
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.1.0)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # By default, build in Release mode. Must appear before project() command
 if (NOT DEFINED CMAKE_BUILD_TYPE)
@@ -14,12 +16,13 @@ enable_testing()
 # Bump versions on release
 set(MUPARSER_VERSION_MAJOR 2)
 set(MUPARSER_VERSION_MINOR 2)
-set(MUPARSER_VERSION_PATCH 5)
+set(MUPARSER_VERSION_PATCH 6)
 set(MUPARSER_VERSION ${MUPARSER_VERSION_MAJOR}.${MUPARSER_VERSION_MINOR}.${MUPARSER_VERSION_PATCH})
 
 # Build options
 option(ENABLE_SAMPLES "Build the samples" ON)
 option(ENABLE_OPENMP "Enable OpenMP for multithreading" OFF)
+option(BUILD_SHARED_LIBS "Build shared/static libs" ON)
 
 if(ENABLE_OPENMP)
     find_package(OpenMP REQUIRED)
@@ -118,11 +121,11 @@ install(FILES
 # Define variables for the pkg-config file
 set(PACKAGE_NAME muparser)
 configure_file(
-    "${CMAKE_SOURCE_DIR}/build/autoconf/muparser.pc.cmakein"
-    "${CMAKE_BINARY_DIR}/muparser.pc"
+    muparser.pc.in
+    ${CMAKE_BINARY_DIR}/muparser.pc
     @ONLY
 )
 install(
-    FILES "${CMAKE_BINARY_DIR}/muparser.pc"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    FILES ${CMAKE_BINARY_DIR}/muparser.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
