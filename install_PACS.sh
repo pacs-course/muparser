@@ -2,13 +2,15 @@
 #
 # This is the utility to install muparser for the PACS examples
 #
+# create the build directory
+mkdir -p build
 #
 # go in the build directory (remove all old files in that dir if needed)
 cd build/
 #
 # run cmake
 #
-# this celates the dynamic libraries and optimised code
+# this creates the dynamic libraries and optimised code
 cmake -D CMAKE_INSTALL_PREFIX=../../../Examples/ ../
 
 # uncomment this line (and comment the previous one)
@@ -20,3 +22,5 @@ cmake -D CMAKE_INSTALL_PREFIX=../../../Examples/ ../
 make
 #install
 make install
+# remove build directory
+rm -r -f build/
