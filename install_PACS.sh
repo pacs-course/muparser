@@ -23,4 +23,5 @@ make
 #install
 make install
 # remove build directory
+cd ..
 rm -r -f build/
