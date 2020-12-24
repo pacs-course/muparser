@@ -1,25 +1,84 @@
-#######################################################################
-#                                                                     #
-#                                                                     #
-#                 __________                                          #
-#    _____   __ __\______   \_____  _______  ______  ____ _______     #
-#   /     \ |  |  \|     ___/\__  \ \_  __ \/  ___/_/ __ \\_  __ \    #
-#  |  Y Y  \|  |  /|    |     / __ \_|  | \/\___ \ \  ___/ |  | \/    #
-#  |__|_|  /|____/ |____|    (____  /|__|  /____  > \___  >|__|       #
-#        \/                       \/            \/      \/            #
-#					  Fast math parser Library                        #
-#                                                                     #
-#  Copyright (C) 2015 Ingo Berg                                       #
-#                                                                     #
-#  Web:     muparser.beltoforion.de                                   #
-#  e-mail:  muparser@beltoforion.de                                   #
-#                                                                     #
-#                                                                     #
-#######################################################################
- 
+
+     _____  __ _____________ _______  ______ ___________
+    /     \|  |  \____ \__  \\_  __ \/  ___// __ \_  __ \
+   |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
+   |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
+         \/      |__|       \/           \/     \/
+    Copyright (C) 2004 - 2020 Ingo Berg
+
+=======================================================================
+    https://beltoforion.de/en/muparser
+=======================================================================
 
 History:
 --------
+
+GitHub Master
+---------------------
+  Build System Changes (CMake):
+   * Added a new option "-DENABLE_WIDE_CHAR" to CMake for building muparser with wide character support
+   
+  Compiler Warnings fixed/disabled (Visual Studio):
+   * Disabled compiler warning 26812 (Prefer 'enum class' over 'enum')
+     I consider this a bogus warning. Use of plain old enums has not been deprecated and only MSVC is complaining. 
+   * Disabled compiler warning 4251 (... needs to have dll-interface to be used by clients of class ...)
+     When the build system was changed to CMake Linux and Windows builds were unified. Each dynamic library contains the 
+     class interface as well as the C-interface. Before the linux shared library was using the class interface and the 
+     windows dll was using the C-interface.
+    
+     Only the C-Interface is safe to use when you intent to bring an executable to another linux distribution or windows version! 
+     This is up to the client software. I cannot change this because on linux the shared library was always using the class 
+     interface. Usually this is not a problem since distributions compile all applications from scratch. 
+
+     If you use the class interface you can not take for granted that your software will run with a muparser 
+     version compiled for another operating system or linux distribution! You must either use the C-Interface if you 
+     want this or use a static library build of muparser!
+
+  Security Fixes: (The issues were present in all prior stable releases)
+   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=24167 
+   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=24355
+   
+  Bugfixes:
+   * fixed a couple of issues for building the C-Interface (muParserDLL.cpp/.h) with wide character support.
+
+Rev 2.3.2: 17.06.2020
+---------------------
+  API-Change Revertion (to 2.3.0):
+   * removed final keyword from Parser class (added in 2.3.0) as this was breaking existing Applications
+
+  Changes:
+   * made Parser class final
+   * using OpenMP is now the default settings for cmake based builds
+   * added optimization for trivial expressions. (Expressions whose RPN only has a single entry)
+   * introduced a maximum length for expressions (5000 Character)
+   * introduced a maximum length for identifiers (100 Characters)
+   * removed the MUP_MATH_EXCEPTION macro and related functionality. (C++ exceptions for divide by zero or sqrt of a negative number are no longer supported)
+   * removed ParserStack.h (replaced with std::stack)
+   * removed macros for defining E and PI (replaced with a static constants)
+   * source code is now aimed at C++17
+   * the MUP_ASSERT macro is no longer removed in release builds for better protection against segmentation faults
+
+  Security Fixes: (The issues were present in all prior stable releases)
+   * Prevented multiple access violations for malformed expressions with if then else and functions taking multiple arguments like "sum(0?1,2,3,4:5)"
+   	   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=23330
+	   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=22922
+	   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=22938
+	   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=23330
+	   * https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=23410
+   * Added additional runtime checks for release builds to prevent segmentation faults for invalid expressions
+
+  Bugfixes:
+   * Fixed an issue where the bulk mode could hang on GCC/CLANG builds due to OpenMP chunksize dropping below 1.
+
+Rev 2.3.0 - 2.3.1:
+------------------
+Short lived releases or prereleases that were replaced by 2.3.2 almost instantly due to API breaking changes. Version 2.3.2 is the successor to version 2.2.6
+
+Rev 2.2.6: 04.10.2018
+---------------------
+  Changes:
+   * Build system is now based on cmake
+   * several compiler warnings fixed
 
 Rev 2.2.5: 27.04.2015
 ---------------------
