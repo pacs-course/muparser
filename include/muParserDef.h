@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2020 Ingo Berg
+   Copyright (C) 2004 - 2021 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -321,8 +321,8 @@ namespace mu
 
 	// Parser callbacks
 
-	/** \brief Callback type used for functions without arguments. */
-	typedef value_type(*generic_fun_type)();
+	/** \brief Function type used to erase type.  Voluntarily needs explicit cast with all other *fun_type*. */
+	typedef void(*erased_fun_type)();
 
 	/** \brief Callback type used for functions without arguments. */
 	typedef value_type(*fun_type0)();
@@ -357,6 +357,39 @@ namespace mu
 	/** \brief Callback type used for functions with ten arguments. */
 	typedef value_type(*fun_type10)(value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
 
+	/** \brief Callback type with user data (not null) used for functions without arguments. */
+	typedef value_type(*fun_userdata_type0)(void*);
+
+	/** \brief Callback type with user data (not null) used for functions with a single arguments. */
+	typedef value_type(*fun_userdata_type1)(void*, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with two arguments. */
+	typedef value_type(*fun_userdata_type2)(void*, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with three arguments. */
+	typedef value_type(*fun_userdata_type3)(void*, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with four arguments. */
+	typedef value_type(*fun_userdata_type4)(void*, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with five arguments. */
+	typedef value_type(*fun_userdata_type5)(void*, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with six arguments. */
+	typedef value_type(*fun_userdata_type6)(void*, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with seven arguments. */
+	typedef value_type(*fun_userdata_type7)(void*, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with eight arguments. */
+	typedef value_type(*fun_userdata_type8)(void*, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with nine arguments. */
+	typedef value_type(*fun_userdata_type9)(void*, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with ten arguments. */
+	typedef value_type(*fun_userdata_type10)(void*, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
 	/** \brief Callback type used for functions without arguments. */
 	typedef value_type(*bulkfun_type0)(int, int);
 
@@ -390,8 +423,44 @@ namespace mu
 	/** \brief Callback type used for functions with ten arguments. */
 	typedef value_type(*bulkfun_type10)(int, int, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
 
+	/** \brief Callback type with user data (not null) used for functions without arguments. */
+	typedef value_type(*bulkfun_userdata_type0)(void*, int, int);
+
+	/** \brief Callback type with user data (not null) used for functions with a single arguments. */
+	typedef value_type(*bulkfun_userdata_type1)(void*, int, int, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with two arguments. */
+	typedef value_type(*bulkfun_userdata_type2)(void*, int, int, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with three arguments. */
+	typedef value_type(*bulkfun_userdata_type3)(void*, int, int, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with four arguments. */
+	typedef value_type(*bulkfun_userdata_type4)(void*, int, int, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with five arguments. */
+	typedef value_type(*bulkfun_userdata_type5)(void*, int, int, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with six arguments. */
+	typedef value_type(*bulkfun_userdata_type6)(void*, int, int, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with seven arguments. */
+	typedef value_type(*bulkfun_userdata_type7)(void*, int, int, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with eight arguments. */
+	typedef value_type(*bulkfun_userdata_type8)(void*, int, int, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with nine arguments. */
+	typedef value_type(*bulkfun_userdata_type9)(void*, int, int, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions with ten arguments. */
+	typedef value_type(*bulkfun_userdata_type10)(void*, int, int, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type, value_type);
+
 	/** \brief Callback type used for functions with a variable argument list. */
 	typedef value_type(*multfun_type)(const value_type*, int);
+
+	/** \brief Callback type with user data (not null) used for functions and a variable argument list. */
+	typedef value_type(*multfun_userdata_type)(void*, const value_type*, int);
 
 	/** \brief Callback type used for functions taking a string as an argument. */
 	typedef value_type(*strfun_type1)(const char_type*);
@@ -408,6 +477,21 @@ namespace mu
 	/** \brief Callback type used for functions taking a string and two values as arguments. */
 	typedef value_type(*strfun_type5)(const char_type*, value_type, value_type, value_type, value_type);
 
+	/** \brief Callback type with user data (not null) used for functions taking a string as an argument. */
+	typedef value_type(*strfun_userdata_type1)(void*, const char_type*);
+
+	/** \brief Callback type with user data (not null) used for functions taking a string and a value as arguments. */
+	typedef value_type(*strfun_userdata_type2)(void*, const char_type*, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions taking a string and two values as arguments. */
+	typedef value_type(*strfun_userdata_type3)(void*, const char_type*, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions taking a string and a value as arguments. */
+	typedef value_type(*strfun_userdata_type4)(void*, const char_type*, value_type, value_type, value_type);
+
+	/** \brief Callback type with user data (not null) used for functions taking a string and two values as arguments. */
+	typedef value_type(*strfun_userdata_type5)(void*, const char_type*, value_type, value_type, value_type, value_type);
+
 	/** \brief Callback used for functions that identify values in a string. */
 	typedef int (*identfun_type)(const char_type* sExpr, int* nPos, value_type* fVal);
 
@@ -416,8 +500,8 @@ namespace mu
 
 	static const int MaxLenExpression = 5000;
 	static const int MaxLenIdentifier = 100;
-	static const string_type ParserVersion = string_type(_T("2.3.3 (Unstable Development Build!)"));
-	static const string_type ParserVersionDate = string_type(_T("20200917"));
+	static const string_type ParserVersion = string_type(_T("2.3.3 (Development Build)"));
+	static const string_type ParserVersionDate = string_type(_T("20210328"));
 } // end of namespace
 
 #if defined(_MSC_VER)

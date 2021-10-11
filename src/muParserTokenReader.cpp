@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2020 Ingo Berg
+   Copyright (C) 2004 - 2021 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -378,7 +378,7 @@ namespace mu
 		if (a_iPos != iEnd)
 			a_sTok = string_type(m_strFormula.begin() + a_iPos, m_strFormula.begin() + iEnd);
 
-		return iEnd;
+		return static_cast<int>(iEnd);
 	}
 
 
@@ -400,7 +400,7 @@ namespace mu
 		if (a_iPos != iEnd)
 		{
 			a_sTok = string_type(m_strFormula.begin() + a_iPos, m_strFormula.begin() + iEnd);
-			return iEnd;
+			return static_cast<int>(iEnd);
 		}
 		else
 		{

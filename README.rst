@@ -23,7 +23,7 @@ To read the full documentation please go to: http://beltoforion.de/en/muparser.
 
 See Install.txt for installation
 
-Change Notes for Revision 2.3.3  (Prerelease; Still under Development!)
+Change Notes for Revision 2.3.3  (Prerelease)
 ===========================
 Security Fixes:  
 ------------
@@ -36,6 +36,8 @@ The following new issues, discovered by oss-fuzz are fixed:
 Bugfixes:
 -----------
 * Fixed a couple of issues for building the C-Interface (muParserDLL.cpp/.h) with wide character support.
+* fix for #93 (https://github.com/beltoforion/muparser/issues/93)
+* fix for #94 (https://github.com/beltoforion/muparser/issues/94)
 
 Fixed Compiler Warnings:
 -----------
