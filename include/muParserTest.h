@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2004 - 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -171,6 +171,13 @@ namespace mu
 				return val + v2 + v3 + v4 + v5;
 			}
 
+			static value_type StrFun6(const char_type* v1, value_type v2, value_type v3, value_type v4, value_type v5, value_type v6)
+			{
+				int val(0);
+				stringstream_type(v1) >> val;
+				return val + v2 + v3 + v4 + v5 + v6;
+			}
+
 			static value_type StrToFloat(const char_type* a_szMsg)
 			{
 				value_type val(0);
@@ -252,7 +259,8 @@ namespace mu
 			int TestBulkMode();
 			int TestOssFuzzTestCases();
 			int TestOptimizer();
-
+			int TestLocalization();
+			
 			void Abort() const;
 
 		public:
@@ -268,6 +276,7 @@ namespace mu
 			// Test Double Parser
 			int EqnTest(const string_type& a_str, double a_fRes, bool a_fPass);
 			int EqnTestWithVarChange(const string_type& a_str, double a_fRes1, double a_fVar1,	double a_fRes2,	double a_fVar2);
+			int EqnTestLocalized(const string_type& a_str, double a_fRes, bool a_fPass);
 			int ThrowTest(const string_type& a_str, int a_iErrc, bool a_bFail = true);
 
 			// Test Int Parser

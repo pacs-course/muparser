@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2004 - 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -69,8 +69,8 @@ namespace mu
 		static value_type  Pow(value_type v1, value_type v2);
 		static value_type  Shr(value_type v1, value_type v2);
 		static value_type  Shl(value_type v1, value_type v2);
-		static value_type  LogAnd(value_type v1, value_type v2);
-		static value_type  LogOr(value_type v1, value_type v2);
+		static value_type  BitAnd(value_type v1, value_type v2);
+		static value_type  BitOr(value_type v1, value_type v2);
 		static value_type  And(value_type v1, value_type v2);
 		static value_type  Or(value_type v1, value_type v2);
 		static value_type  Xor(value_type v1, value_type v2);

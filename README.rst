@@ -1,6 +1,3 @@
-.. image:: https://travis-ci.org/beltoforion/muparser.svg?branch=master
-    :target: https://travis-ci.org/beltoforion/muparser
-
 .. image:: https://ci.appveyor.com/api/projects/status/u4882uj8btuspj9x?svg=true
     :target: https://ci.appveyor.com/project/beltoforion/muparser
 
@@ -13,18 +10,43 @@
 .. image:: https://repology.org/badge/tiny-repos/muparser.svg
     :target: https://repology.org/project/muparser/versions
 
+muparser - fast math parser library
+===================================
 
-muparser - Fast Math Parser 2.3.3 
+.. image:: http://beltoforion.de/en/muparser/images/title.webp 
+
+Change Notes for Revision 2.3.5
 ===========================
-.. image:: http://beltoforion.de/en/muparser/images/title.jpg
- 
 
+Fixed Compiler Warnings:
+-----------
+- Fix problem with IntelLLVM fast math
+
+Build System:  
+------------
+- fix for https://github.com/beltoforion/muparser/issues/127 (minimum required cmake version set to 3.15)
+- fix for https://github.com/beltoforion/muparser/issues/123 (Strange behavior of the postfix operator on macOS)
+- fix for https://github.com/beltoforion/muparser/issues/132 example1 fails to builds on Windows with mingw gcc
+
+Change Notes for Revision 2.3.4  
+===========================
+
+Maintainance Release with updates of the cmake build system.
+
+Build System:  
+------------
+- cmake is using OpenMP target and setting _UNICODE preprocessor definition
+
+Fixed Compiler Warnings:
+-----------
+- fix for https://github.com/beltoforion/muparser/issues/117 (sprintf deprecated)
+
+Change Notes for Revision 2.3.3  
+===========================
 To read the full documentation please go to: http://beltoforion.de/en/muparser.
 
 See Install.txt for installation
 
-Change Notes for Revision 2.3.3  (Prerelease)
-===========================
 Security Fixes:  
 ------------
 The following new issues, discovered by oss-fuzz are fixed: 
@@ -36,8 +58,9 @@ The following new issues, discovered by oss-fuzz are fixed:
 Bugfixes:
 -----------
 * Fixed a couple of issues for building the C-Interface (muParserDLL.cpp/.h) with wide character support.
-* fix for #93 (https://github.com/beltoforion/muparser/issues/93)
-* fix for #94 (https://github.com/beltoforion/muparser/issues/94)
+* fix for https://github.com/beltoforion/muparser/issues/93
+* fix for https://github.com/beltoforion/muparser/issues/94
+* fix for https://github.com/beltoforion/muparser/issues/110; new expression size limit is 20000
 
 Fixed Compiler Warnings:
 -----------

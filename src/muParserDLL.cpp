@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2004 - 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -208,9 +208,8 @@ API_EXPORT(const muChar_t*) mupGetVersion(muParserHandle_t a_hParser)
 		muParser_t* const p(AsParser(a_hParser));
 
 #ifndef _UNICODE
-		sprintf(s_tmpOutBuf, "%s", p->GetVersion().c_str());
+		snprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), "%s", p->GetVersion().c_str());
 #else
-//		wsprintf(s_tmpOutBuf, _T("%s"), p->GetVersion().c_str());
 		swprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), _T("%s"), p->GetVersion().c_str());
 #endif
 
@@ -876,9 +875,8 @@ API_EXPORT(const muChar_t*) mupGetExpr(muParserHandle_t a_hParser)
 		// C# explodes when pMsg is returned directly. For some reason it can't access
 		// the memory where the message lies directly.
 #ifndef _UNICODE
-		sprintf(s_tmpOutBuf, "%s", p->GetExpr().c_str());
+		snprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), "%s", p->GetExpr().c_str());
 #else
-//		wsprintf(s_tmpOutBuf, _T("%s"), p->GetExpr().c_str());
 		swprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), _T("%s"), p->GetExpr().c_str());
 #endif
 
@@ -897,12 +895,12 @@ API_EXPORT(void) mupDefinePostfixOprt(muParserHandle_t a_hParser, const muChar_t
 	MU_CATCH
 }
 
-
-API_EXPORT(void) mupDefineInfixOprt(muParserHandle_t a_hParser, const muChar_t* a_szName, muFun1_t a_pOprt,	muBool_t a_bAllowOpt)
+// Signature changed to fix #125 (https://github.com/beltoforion/muparser/issues/125)
+API_EXPORT(void) mupDefineInfixOprt(muParserHandle_t a_hParser, const muChar_t* a_szName, muFun1_t a_pOprt, int a_iPrec, muBool_t a_bAllowOpt)
 {
 	MU_TRY
 		muParser_t* const p(AsParser(a_hParser));
-		p->DefineInfixOprt(a_szName, a_pOprt, a_bAllowOpt != 0);
+		p->DefineInfixOprt(a_szName, a_pOprt, a_iPrec, a_bAllowOpt != 0);
 	MU_CATCH
 }
 
@@ -1214,9 +1212,8 @@ API_EXPORT(const muChar_t*) mupGetErrorMsg(muParserHandle_t a_hParser)
 	// C# explodes when pMsg is returned directly. For some reason it can't access
 	// the memory where the message lies directly.
 #ifndef _UNICODE
-	sprintf(s_tmpOutBuf, "%s", pMsg);
+	snprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), "%s", pMsg);
 #else
-	//wsprintf(s_tmpOutBuf, _T("%s"), pMsg);
 	swprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), _T("%s"), pMsg);
 #endif
 
@@ -1233,9 +1230,8 @@ API_EXPORT(const muChar_t*) mupGetErrorToken(muParserHandle_t a_hParser)
 	// C# explodes when pMsg is returned directly. For some reason it can't access
 	// the memory where the message lies directly.
 #ifndef _UNICODE
-	sprintf(s_tmpOutBuf, "%s", pToken);
+	snprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), "%s", pToken);
 #else
-	//wsprintf(s_tmpOutBuf, _T("%s"), pToken);
 	swprintf(s_tmpOutBuf, count_of(s_tmpOutBuf), _T("%s"), pToken);
 #endif
 

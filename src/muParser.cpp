@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2004 - 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -33,6 +33,8 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <cstdlib>
+
 
 using namespace std;
 
@@ -54,10 +56,34 @@ namespace mu
 	*/
 	int Parser::IsVal(const char_type* a_szExpr, int* a_iPos, value_type* a_fVal)
 	{
+#if defined(__APPLE__)
+        // 2023-12-23 Issue #136: This code breaks localization!
+		//
+		// I decided to not give a shit about localization being 
+		// broken on Macs's because APPLE does not give a shit about the 
+		// stringstream  being broken either. They have the resources to fix their
+		// compiler, i do not have the resources to work around their failures.
+
+		// fix for #123; std::Stringstream is broken on Mac; use std::stod instead
+		try
+		{
+			std::size_t charsProcessed;
+			value_type fVal = static_cast<value_type>(std::stod(string_type(a_szExpr), &charsProcessed));
+			if (charsProcessed == 0)
+				return 0;
+
+			*a_iPos += (int)charsProcessed;
+			*a_fVal = fVal;
+			return 1;
+		}
+		catch (...)
+		{
+			return 0;
+		}
+#else
 		value_type fVal(0);
 
 		stringstream_type stream(a_szExpr);
-		stream.seekg(0);        // todo:  check if this really is necessary
 		stream.imbue(Parser::s_locale);
 		stream >> fVal;
 		stringstream_type::pos_type iEnd = stream.tellg(); // Position after reading
@@ -68,6 +94,7 @@ namespace mu
 		*a_iPos += (int)iEnd;
 		*a_fVal = fVal;
 		return 1;
+#endif		
 	}
 
 

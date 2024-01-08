@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -39,6 +39,7 @@
 
 #include "muParserTest.h"
 #include "muParser.h"
+#include "muParserBytecode.h"
 
 using namespace std;
 using namespace mu;
@@ -189,7 +190,7 @@ static void Splash()
 	mu::console() << _T(R"( |__|_|  /____/|   __(____  /___|  /___  >\___  >|__|    )") << _T("\n");
 	mu::console() << _T(R"(       \/      |__|       \/           \/     \/        )") << _T("\n");
 	mu::console() << _T("  Version ") << Parser().GetVersion(pviFULL) << _T("\n");
-	mu::console() << _T("  (C) 2004 - 2020 Ingo Berg\n");
+	mu::console() << _T("  (C) 2022 Ingo Berg\n");
 	mu::console() << _T("\n");
 	mu::console() << _T("-----------------------------------------------------------\n");
 
@@ -437,6 +438,9 @@ void CalcBulk()
 static void Calc()
 {
 	mu::Parser  parser;
+	parser.SetDecSep(',');
+	parser.SetArgSep(';');
+	parser.SetThousandsSep('.');
 
 	// Add some variables
 	value_type  vVarVal[] = { 1, 2 }; // Values of the parser variables
@@ -474,6 +478,15 @@ static void Calc()
 	// Define the variable factory
 	parser.SetVarFactory(AddVariable, &parser);
 
+	// You can extract the bytecode of a parsed functions and save it for later use.
+//	parser.SetExpr(_T("sin(a)+strfun2(sVar1, 1 , 2)"));
+//	parser.Eval();
+//	ParserByteCode bytecode1(parser.GetByteCode());
+
+//	parser.SetExpr(_T("10*cos(a)"));
+//	parser.Eval();
+//	ParserByteCode bytecode2(parser.GetByteCode());
+
 	for (;;)
 	{
 		try
@@ -491,7 +504,21 @@ static void Calc()
 			if (!sLine.length())
 				continue;
 
-			parser.SetExpr(sLine);
+			if (sLine == _T("restore1"))
+			{
+//				parser.SetByteCode(bytecode1);
+//				bytecode1.AsciiDump();
+			}
+			else if (sLine == _T("restore2"))
+			{
+//				parser.SetByteCode(bytecode2);
+//				bytecode2.AsciiDump();
+			}
+			else
+			{
+				parser.SetExpr(sLine);
+			}
+
 			mu::console() << std::setprecision(12);
 
 			// There are multiple ways to retrieve the result...

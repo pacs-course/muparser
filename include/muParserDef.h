@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2004 - 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -207,18 +207,18 @@ namespace mu
 	/** \brief Parser operator precedence values. */
 	enum EOprtPrecedence
 	{
-		// binary operators
-		prLOR = 1,
-		prLAND = 2,
-		prLOGIC = 3,	///< logic operators
-		prCMP = 4,		///< comparsion operators
-		prADD_SUB = 5,	///< addition
-		prMUL_DIV = 6,	///< multiplication/division
-		prPOW = 7,		///< power operator priority (highest)
+		prLOR = 1,		///< logic or
+		prLAND = 2,		///< logic and
+		prBOR = 3,      ///< bitwise or
+		prBAND = 4,     ///< bitwise and
+		prCMP = 5,		///< comparsion operators
+		prADD_SUB = 6,	///< addition
+		prMUL_DIV = 7,	///< multiplication/division
+		prPOW = 8,		///< power operator priority (highest)
 
 		// infix operators
-		prINFIX = 6,	///< Signs have a higher priority than ADD_SUB, but lower than power operator
-		prPOSTFIX = 6	///< Postfix operator priority (currently unused)
+		prINFIX = 7,	///< Signs have a higher priority than ADD_SUB, but lower than power operator
+		prPOSTFIX = 7	///< Postfix operator priority (currently unused)
 	};
 
 
@@ -276,7 +276,9 @@ namespace mu
 		ecINVALID_CHARACTERS_FOUND = 38,///< The expression or identifier contains invalid non printable characters
 
 		// internal errors
-		ecINTERNAL_ERROR = 39,    ///< Internal error of any kind.
+		ecINTERNAL_ERROR = 39,			///< Internal error of any kind.
+
+		ecBYTECODE_IMPORT_EXPORT_DISABLED = 40,	///< Bytecode cannot be exported.
 
 		// The last two are special entries 
 		ecCOUNT,                      ///< This is no error code, It just stores just the total number of error codes
@@ -471,11 +473,14 @@ namespace mu
 	/** \brief Callback type used for functions taking a string and two values as arguments. */
 	typedef value_type(*strfun_type3)(const char_type*, value_type, value_type);
 
-	/** \brief Callback type used for functions taking a string and a value as arguments. */
+	/** \brief Callback type used for functions taking a string and three values as arguments. */
 	typedef value_type(*strfun_type4)(const char_type*, value_type, value_type, value_type);
 
-	/** \brief Callback type used for functions taking a string and two values as arguments. */
+	/** \brief Callback type used for functions taking a string and four values as arguments. */
 	typedef value_type(*strfun_type5)(const char_type*, value_type, value_type, value_type, value_type);
+
+	/** \brief Callback type used for functions taking a string and five values as arguments. */
+	typedef value_type(*strfun_type6)(const char_type*, value_type, value_type, value_type, value_type, value_type);
 
 	/** \brief Callback type with user data (not null) used for functions taking a string as an argument. */
 	typedef value_type(*strfun_userdata_type1)(void*, const char_type*);
@@ -492,16 +497,19 @@ namespace mu
 	/** \brief Callback type with user data (not null) used for functions taking a string and two values as arguments. */
 	typedef value_type(*strfun_userdata_type5)(void*, const char_type*, value_type, value_type, value_type, value_type);
 
+	/** \brief Callback type with user data (not null) used for functions taking a string and five values as arguments. */
+	typedef value_type(*strfun_userdata_type6)(void*, const char_type*, value_type, value_type, value_type, value_type, value_type);
+
 	/** \brief Callback used for functions that identify values in a string. */
 	typedef int (*identfun_type)(const char_type* sExpr, int* nPos, value_type* fVal);
 
 	/** \brief Callback used for variable creation factory functions. */
 	typedef value_type* (*facfun_type)(const char_type*, void*);
 
-	static const int MaxLenExpression = 5000;
+	static const int MaxLenExpression = 20000;
 	static const int MaxLenIdentifier = 100;
-	static const string_type ParserVersion = string_type(_T("2.3.3 (Development Build)"));
-	static const string_type ParserVersionDate = string_type(_T("20210328"));
+	static const string_type ParserVersion = string_type(_T("2.3.4 (Develop)"));
+	static const string_type ParserVersionDate = string_type(_T("20231224"));
 } // end of namespace
 
 #if defined(_MSC_VER)

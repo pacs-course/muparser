@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2021 Ingo Berg
+   Copyright (C) 2022 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -261,19 +261,43 @@ namespace mu
 		m_pTokenReader->ReInit();
 	}
 
-	//---------------------------------------------------------------------------
+
 	void ParserBase::OnDetectVar(string_type* /*pExpr*/, int& /*nStart*/, int& /*nEnd*/)
 	{}
 
-	//---------------------------------------------------------------------------
-	/** \brief Returns the bytecode of the current expression.
+
+	/** \brief Returns a copy of the bytecode of the current expression.
 	*/
 	const ParserByteCode& ParserBase::GetByteCode() const
 	{
+		// If a variable factory is defined the bytecode may contain references to implicitely 
+		// created variables. 
+//		if (m_pTokenReader->HasVarCreator())
+//			Error(ecBYTECODE_IMPORT_EXPORT_DISABLED);
+
 		return m_vRPN;
 	}
 
-	//---------------------------------------------------------------------------
+
+	/** \brief Restore a previously saved bytecode. */
+	void ParserBase::SetByteCode(const ParserByteCode& a_ByteCode)
+	{
+		// If a variable factory is defined the bytecode may contain references to dynamically
+		// created variables. 
+//		if (m_pTokenReader->HasVarCreator())
+//			Error(ecBYTECODE_IMPORT_EXPORT_DISABLED);
+
+		m_vRPN = a_ByteCode;
+
+		// restore expression environment
+		string_type expr;
+		std::tie(expr, m_vStringBuf) = a_ByteCode.RestoreEnvironment();
+		m_pTokenReader->SetFormula(expr);
+
+		m_pParseFormula = &ParserBase::ParseCmdCode;
+	}
+
+
 	/** \brief Returns the version of muparser.
 		\param eInfo A flag indicating whether the full version info should be
 					 returned or not.
@@ -774,6 +798,7 @@ namespace mu
 			case 2: valTok.SetVal(1); a_vArg[2].GetAsString();  a_vArg[1].GetVal();  a_vArg[0].GetVal();  break;
 			case 3: valTok.SetVal(1); a_vArg[3].GetAsString();  a_vArg[2].GetVal();  a_vArg[1].GetVal();  a_vArg[0].GetVal();  break;
 			case 4: valTok.SetVal(1); a_vArg[4].GetAsString();  a_vArg[3].GetVal();  a_vArg[2].GetVal();  a_vArg[1].GetVal();  a_vArg[0].GetVal();  break;
+			case 5: valTok.SetVal(1); a_vArg[5].GetAsString();  a_vArg[4].GetVal();  a_vArg[3].GetVal();  a_vArg[2].GetVal();  a_vArg[1].GetVal(); a_vArg[0].GetVal(); break;
 			default: Error(ecINTERNAL_ERROR);
 			}
 		}
@@ -1218,6 +1243,7 @@ namespace mu
 				case 2: stack[sidx] = pTok->Fun.cb.call_strfun<3>(m_vStringBuf[iIdxStack].c_str(), stack[sidx], stack[sidx + 1]); continue;
 				case 3: stack[sidx] = pTok->Fun.cb.call_strfun<4>(m_vStringBuf[iIdxStack].c_str(), stack[sidx], stack[sidx + 1], stack[sidx + 2]); continue;
 				case 4: stack[sidx] = pTok->Fun.cb.call_strfun<5>(m_vStringBuf[iIdxStack].c_str(), stack[sidx], stack[sidx + 1], stack[sidx + 2], stack[sidx + 3]); continue;
+				case 5: stack[sidx] = pTok->Fun.cb.call_strfun<6>(m_vStringBuf[iIdxStack].c_str(), stack[sidx], stack[sidx + 1], stack[sidx + 2], stack[sidx + 3], stack[sidx + 4]); continue;
 				}
 
 				continue;
@@ -1530,12 +1556,14 @@ namespace mu
 
 			if (m_vRPN.GetSize() == 2)
 			{
+				m_vRPN.StoreEnvironment(m_pTokenReader->GetExpr(), m_vStringBuf);
 				m_pParseFormula = &ParserBase::ParseCmdCodeShort;
 				m_vStackBuffer[1] = (this->*m_pParseFormula)();
 				return m_vStackBuffer[1];
 			}
 			else
 			{
+				m_vRPN.StoreEnvironment(m_pTokenReader->GetExpr(), m_vStringBuf);
 				m_pParseFormula = &ParserBase::ParseCmdCode;
 				return (this->*m_pParseFormula)();
 			}
