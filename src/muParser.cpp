@@ -56,15 +56,17 @@ namespace mu
 	*/
 	int Parser::IsVal(const char_type* a_szExpr, int* a_iPos, value_type* a_fVal)
 	{
-#if defined(__APPLE__)
-        // 2023-12-23 Issue #136: This code breaks localization!
+		// There is an issue with libc++ where it creates an error if a double value is followed by a character which
+		// is the case when using postfix operators.
 		//
-		// I decided to not give a shit about localization being 
-		// broken on Macs's because APPLE does not give a shit about the 
-		// stringstream  being broken either. They have the resources to fix their
-		// compiler, i do not have the resources to work around their failures.
+		// http://cplusplus.github.io/LWG/lwg-defects.html#2381
+		//
+		// This happens only with libc++, not with libstdc++ (Gnu C++ standard library)
+		// It seems that Macs are using libc++. This is causing #123. The fix below will fix #123
+		// but is will break localization support and cause #136.
 
-		// fix for #123; std::Stringstream is broken on Mac; use std::stod instead
+		// I'm disabling this fix. For systems using libc++ you must put a space between floating point numbers and postfix operators.
+#if defined(__APPLE__) && defined(NEVERTRUE)
 		try
 		{
 			std::size_t charsProcessed;
@@ -175,6 +177,8 @@ namespace mu
 			DefineFun(_T("avg"), MathImpl<value_type>::Avg);
 			DefineFun(_T("min"), MathImpl<value_type>::Min);
 			DefineFun(_T("max"), MathImpl<value_type>::Max);
+			// Random number
+			DefineFun(_T("rnd"), MathImpl<value_type>::Rnd, false);
 		}
 	}
 
