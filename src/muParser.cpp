@@ -148,6 +148,7 @@ namespace mu
 			DefineFun(_T("sin"), MathImpl<value_type>::Sin);
 			DefineFun(_T("cos"), MathImpl<value_type>::Cos);
 			DefineFun(_T("tan"), MathImpl<value_type>::Tan);
+			DefineFun(_T("cot"), MathImpl<value_type>::Cot);
 			// arcus functions
 			DefineFun(_T("asin"), MathImpl<value_type>::ASin);
 			DefineFun(_T("acos"), MathImpl<value_type>::ACos);
@@ -157,6 +158,7 @@ namespace mu
 			DefineFun(_T("sinh"), MathImpl<value_type>::Sinh);
 			DefineFun(_T("cosh"), MathImpl<value_type>::Cosh);
 			DefineFun(_T("tanh"), MathImpl<value_type>::Tanh);
+			DefineFun(_T("coth"), MathImpl<value_type>::Coth);
 			// arcus hyperbolic functions
 			DefineFun(_T("asinh"), MathImpl<value_type>::ASinh);
 			DefineFun(_T("acosh"), MathImpl<value_type>::ACosh);

@@ -118,6 +118,7 @@ namespace mu
 		static T Sin(T v) { return sin(v); }
 		static T Cos(T v) { return cos(v); }
 		static T Tan(T v) { return tan(v); }
+		static T Cot(T v) { return 1.0 / tan(v); }
 		static T ASin(T v) { return asin(v); }
 		static T ACos(T v) { return acos(v); }
 		static T ATan(T v) { return atan(v); }
@@ -125,6 +126,7 @@ namespace mu
 		static T Sinh(T v) { return sinh(v); }
 		static T Cosh(T v) { return cosh(v); }
 		static T Tanh(T v) { return tanh(v); }
+		static T Coth(T v) { return 1.0 / tanh(v); }
 		static T ASinh(T v) { return log(v + sqrt(v * v + 1)); }
 		static T ACosh(T v) { return log(v + sqrt(v * v - 1)); }
 		static T ATanh(T v) { return ((T)0.5 * log((1 + v) / (1 - v))); }
