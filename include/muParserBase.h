@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2022 Ingo Berg
+   Copyright (C) 2004 - 2026 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -52,6 +52,10 @@
 
 namespace mu
 {
+	namespace Test {
+		class ParserTester;
+	}
+
 	/** \file
 		\brief This file contains the class definition of the muparser engine.
 	*/
@@ -68,6 +72,7 @@ namespace mu
 	class API_EXPORT_CXX ParserBase
 	{
 		friend class ParserTokenReader;
+		friend class mu::Test::ParserTester;
 
 	private:
 
@@ -153,6 +158,16 @@ namespace mu
 		{
 			AddCallback(a_strName, ParserCallback(a_pFun, a_pUserData, a_bAllowOpt), m_FunDef, ValidNameChars());
 		}
+
+        /** \brief Checks the existence of a function by name.
+
+         This method determines whether a function with the specified name
+         is defined in the parser's function registry.
+
+         \param a_strName The name of the function to check.
+         \return True if the function exists, otherwise false.
+         */
+        bool HasFun(const string_type& a_strName) const;
 
 		void DefineOprt(const string_type& a_strName, fun_type2 a_pFun, unsigned a_iPri = 0, EOprtAssociativity a_eAssociativity = oaLEFT, bool a_bAllowOpt = false);
 		void DefineConst(const string_type& a_sName, value_type a_fVal);

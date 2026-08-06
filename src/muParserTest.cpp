@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2023 Ingo Berg
+   Copyright (C) 2004 - 2026 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -64,6 +64,8 @@ namespace mu
 			AddTest(&ParserTester::TestBulkMode);
 			AddTest(&ParserTester::TestOptimizer);
 			AddTest(&ParserTester::TestLocalization);
+			AddTest(&ParserTester::TestIssue165);
+		AddTest(&ParserTester::TestIssue168);
 
 			ParserTester::c_iCount = 0;
 		}
@@ -234,6 +236,10 @@ namespace mu
 			iStat += EqnTest(_T("strfun4(\"99\",1,2,3)"), 105, true);
 			iStat += EqnTest(_T("strfun5(\"99\",1,2,3,4)"), 109, true);
 			iStat += EqnTest(_T("strfun6(\"99\",1,2,3,4,5)"), 114, true);
+
+			// multiple strings in the same expression
+			iStat += EqnTest(_T("strlen(\"1\")+strlen(\"11\")"), 3, true);
+			iStat += EqnTest(_T("strlen(\"1\")+strlen(\"22\")++strlen(\"333\")"), 6, true);
 
 			// string constants
 			iStat += EqnTest(_T("atof(str1)+atof(str2)"), 3.33, true);
@@ -415,6 +421,9 @@ namespace mu
 			iStat += EqnTestInt(_T("c * b == 6 * a"), 1, true);
 			iStat += EqnTestInt(_T("2^2^3"), 256, true);
 
+			iStat += ThrowTestInt(_T("8 >> 100"), ecDOMAIN_ERROR);
+			iStat += ThrowTestInt(_T("8 << -1"), ecDOMAIN_ERROR);
+
 
 			if (iStat == 0)
 				mu::console() << _T("passed") << endl;
@@ -548,11 +557,16 @@ namespace mu
 			int iStat = 0;
 			mu::console() << _T("testing syntax engine...");
 
-			iStat += ThrowTest(_T("1,"), ecUNEXPECTED_EOF);  // incomplete hex definition
-			iStat += ThrowTest(_T("a,"), ecUNEXPECTED_EOF);  // incomplete hex definition
-			iStat += ThrowTest(_T("sin(8),"), ecUNEXPECTED_EOF);  // incomplete hex definition
-			iStat += ThrowTest(_T("(sin(8)),"), ecUNEXPECTED_EOF);  // incomplete hex definition
-			iStat += ThrowTest(_T("a{m},"), ecUNEXPECTED_EOF);  // incomplete hex definition
+			iStat += ThrowTest(_T("1,"), ecUNEXPECTED_EOF);               // incomplete hex definition
+			iStat += ThrowTest(_T("a,"), ecUNEXPECTED_EOF);               // incomplete hex definition
+			iStat += ThrowTest(_T("sin(8),"), ecUNEXPECTED_EOF);          // incomplete hex definition
+			iStat += ThrowTest(_T("1++sin(2)"), ecUNARY_PLUS_IN_FRONT_OF_FUNCTION);          // issue 164: double sign in front of a function should be forbidden
+			iStat += ThrowTest(_T("1-+sin(2)"), ecUNARY_PLUS_IN_FRONT_OF_FUNCTION);          // issue 164: double sign in front of a function should be forbidden
+			iStat += ThrowTest(_T("1++strlen(\"333\")"), ecUNARY_PLUS_IN_FRONT_OF_FUNCTION); // issue 164: double sign in front of a function should be forbidden
+			iStat += ThrowTest(_T("1+++sin(2)"), ecUNEXPECTED_OPERATOR);  // too many signs
+			iStat += ThrowTest(_T("1+-+sin(2)"), ecUNEXPECTED_OPERATOR);  // too many signs
+			iStat += ThrowTest(_T("(sin(8)),"), ecUNEXPECTED_EOF);        // incomplete hex definition
+			iStat += ThrowTest(_T("a{m},"), ecUNEXPECTED_EOF);            // incomplete hex definition
 
 			iStat += EqnTest(_T("(1+ 2*a)"), 3, true);   // Spaces within formula
 			iStat += EqnTest(_T("sqrt((4))"), 2, true);  // Multiple brackets
@@ -565,7 +579,7 @@ namespace mu
 			iStat += EqnTest(_T("2++4"), 0, false);      // unexpected operator
 			iStat += EqnTest(_T("2+-4"), 0, false);      // unexpected operator
 			iStat += EqnTest(_T("(2+)"), 0, false);      // unexpected closing bracket
-			iStat += EqnTest(_T("--2"), 0, false);       // double sign
+			iStat += EqnTest(_T("--2"), 0, false);       // double sign in front of a value
 			iStat += EqnTest(_T("ksdfj"), 0, false);     // unknown token
 			iStat += EqnTest(_T("()"), 0, false);        // empty bracket without a function
 			iStat += EqnTest(_T("5+()"), 0, false);      // empty bracket without a function
@@ -1325,8 +1339,46 @@ namespace mu
 				p.DefineFun(_T("strfun4"), StrFun4);
 				p.DefineFun(_T("strfun5"), StrFun5);
 				p.DefineFun(_T("strfun6"), StrFun6);
+				p.DefineFun(_T("strlen"), StrLen);
 				p.SetExpr(a_str);
 				//				p.EnableDebugDump(1, 0);
+				p.Eval();
+			}
+			catch (ParserError& e)
+			{
+				// output the formula in case of an failed test
+				if (a_expectedToFail == false || (a_expectedToFail == true && a_iErrc != e.GetCode()))
+				{
+					mu::console() << _T("\n  ")
+						<< _T("Expression: ") << a_str
+						<< _T("  Code:") << e.GetCode() << _T("(") << e.GetMsg() << _T(")")
+						<< _T("  Expected:") << a_iErrc;
+				}
+
+				return (a_iErrc == e.GetCode()) ? 0 : 1;
+			}
+
+			// if a_expectedToFail == false no exception is expected
+			bool bRet((a_expectedToFail == false) ? 0 : 1);
+			if (bRet == 1)
+			{
+				mu::console() << _T("\n  ")
+					<< _T("Expression: ") << a_str
+					<< _T("  did evaluate; Expected error:") << a_iErrc;
+			}
+
+			return bRet;
+		}
+
+		//---------------------------------------------------------------------------
+		int ParserTester::ThrowTestInt(const string_type& a_str, int a_iErrc, bool a_expectedToFail)
+		{
+			ParserTester::c_iCount++;
+
+			try
+			{
+				ParserInt p;
+				p.SetExpr(a_str);
 				p.Eval();
 			}
 			catch (ParserError& e)
@@ -1360,7 +1412,8 @@ namespace mu
 
 			\return 1 in case of a failure, 0 otherwise.
 		*/
-		int ParserTester::EqnTestWithVarChange(const string_type& a_str,
+		int ParserTester::EqnTestWithVarChange(
+			const string_type& a_str,
 			double a_fVar1,
 			double a_fRes1,
 			double a_fVar2,
@@ -1528,6 +1581,7 @@ namespace mu
 				p1->DefineFun(_T("sum"), Sum);
 				p1->DefineFun(_T("valueof"), ValueOf);
 				p1->DefineFun(_T("atof"), StrToFloat);
+				p1->DefineFun(_T("strlen"), StrLen);
 				p1->DefineFun(_T("strfun1"), StrFun1);
 				p1->DefineFun(_T("strfun2"), StrFun2);
 				p1->DefineFun(_T("strfun3"), StrFun3);
@@ -1656,6 +1710,98 @@ namespace mu
 			{
 				mu::console() << _T("\n  fail: ") << a_str.c_str() << _T(" (unexpected exception)");
 				return 1;  // exceptions other than ParserException are not allowed
+			}
+
+			return iRet;
+		}
+
+		//---------------------------------------------------------------------------
+		/** \brief Evaluate a tet expression.
+
+			\return 1 in case of a failure, 0 otherwise.
+		*/
+		int ParserTester::TestIssue165()
+		{
+			ParserTester::c_iCount++;
+			int iRet(0);
+
+			mu::console() << _T("testing github issue 165...");
+
+			try
+			{
+				Parser  p;
+				p.DefineFun(_T("strlen"), StrLen);
+				p.SetExpr(_T("strlen(\"1\")+strlen(\"22\")+strlen(\"333\")"));
+				p.Eval();
+
+				std::size_t sz = p.m_vStringBuf.size();
+
+				if (sz!=3)
+				{
+					mu::console() << _T("\n  fail: internal string buffer size is ") << sz << _T(" (3 expected).");
+				}
+				else
+					mu::console() << _T("passed") << endl;
+			}
+			catch (...)
+			{
+				mu::console() << _T("\n  fail: unexpected exception");
+				return 1;  // exceptions other than ParserException are not allowed
+			}
+
+			return iRet;
+		}
+
+		//---------------------------------------------------------------------------
+		// Regression test: ClearConst() must also clear m_vStringVarBuf.
+		//
+		// Currently ClearConst() clears m_StrVarDef but not m_vStringVarBuf, so
+		// the value buffer silently accumulates stale entries across calls.  After
+		// one round of DefineStrConst + ClearConst + DefineStrConst the buffer
+		// should have 2 entries (not 4).  This test will FAIL until the bug is fixed.
+		int ParserTester::TestIssue168()
+		{
+			ParserTester::c_iCount++;
+			int iRet(0);
+
+			mu::console() << _T("testing github issue 168...");
+
+			try
+			{
+				Parser p;
+				p.DefineFun(_T("strlen"), StrLen);
+
+				p.DefineStrConst(_T("s1"), _T("hello"));
+				p.DefineStrConst(_T("s2"), _T("world"));
+				p.SetExpr(_T("strlen(s1)+strlen(s2)"));
+				p.Eval();
+
+				p.ClearConst();
+
+				p.DefineStrConst(_T("s1"), _T("hi"));
+				p.DefineStrConst(_T("s2"), _T("!"));
+				p.SetExpr(_T("strlen(s1)+strlen(s2)"));
+				p.Eval();
+
+				// After ClearConst + re-registration the buffer should hold exactly
+				// 2 entries.  If ClearConst does not clear it, the buffer has 4.
+				std::size_t sz = p.m_vStringVarBuf.size();
+				if (sz != 2)
+				{
+					mu::console() << _T("\n  fail: m_vStringVarBuf.size() == ") << sz
+					              << _T(" (expected 2 — ClearConst does not clear the buffer)");
+					iRet++;
+				}
+
+				if (iRet == 0)
+					mu::console() << _T("passed") << endl;
+				else
+					mu::console() << _T("\n  failed with ") << iRet << _T(" errors") << endl;
+			}
+			catch (...)
+			{
+				mu::console() << _T("\n  fail: unexpected exception");
+				return 1;
 			}
 
 			return iRet;

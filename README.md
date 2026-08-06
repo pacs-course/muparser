@@ -1,13 +1,29 @@
 [![GitHub issues](https://img.shields.io/github/issues/beltoforion/muparser.svg?maxAge=360)](https://github.com/beltoforion/muparser/issues)
 [![Version](https://img.shields.io/github/release/beltoforion/muparser.svg?maxAge=360)](https://github.com/beltoforion/muparser/blob/master/CHANGELOG)
 [![Packaging status](https://repology.org/badge/tiny-repos/muparser.svg)](https://repology.org/project/muparser/versions)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/u4882uj8btuspj9x?svg=true)](https://ci.appveyor.com/project/beltoforion/muparser)
 
 muparser - fast math parser library
 ===================================
 
 ![title](https://github.com/beltoforion/muparser/assets/2202567/fbeb2347-9884-4dd7-a3c9-112b605d7390)
 
+Change Notes for Revision 2.3.6 (2026-04-10)
+===========================
+  
+  Changes:
+  -----------
+  - Issue https://github.com/beltoforion/muparser/issues/161: Add HasFun function added to query the existance of a function under a given name.
+  - Issue https://github.com/beltoforion/muparser/issues/93: Add cotangent function
+
+  Security Fixes:
+  -----------
+  - Issue https://github.com/beltoforion/muparser/issues/167: Add additional checks to eliminate possibility of access violations due to malformed expressions. I dont have test cases and do not know whether this issue was exploitable at all but fixing them made sense.
+  - Issue https://github.com/beltoforion/muparser/issues/168: ClearConst() now also clears the internal string variable buffer (m_vStringVarBuf) to keep it in sync with the name-to-index map (m_StrVarDef). Previously stale entries accumulated across repeated ClearConst() calls.
+
+  Fixed Compiler Warnings and Errors:
+  -----------
+  - Issue https://github.com/beltoforion/muparser/issues/160: Refacturing for better source code compatibility with Fil-C; needlessly "clever" code replaced with a more maintainable version.
+    
 Change Notes for Revision 2.3.5
 ===========================
 
@@ -70,4 +86,7 @@ Changes:
 * Adding missing overrides
 * Added a new option "-DENABLE_WIDE_CHAR" to CMake for building muparser with wide character support
 * export muparser targets, such that client projects can import it using find_package() (https://github.com/beltoforion/muparser/pull/81#event-3528671228)
+
+
+
 

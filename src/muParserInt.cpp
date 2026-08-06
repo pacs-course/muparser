@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2022 Ingo Berg
+   Copyright (C) 2026 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -47,10 +47,51 @@ namespace mu
 	value_type ParserInt::Add(value_type v1, value_type v2) { return Round(v1) + Round(v2); }
 	value_type ParserInt::Sub(value_type v1, value_type v2) { return Round(v1) - Round(v2); }
 	value_type ParserInt::Mul(value_type v1, value_type v2) { return Round(v1) * Round(v2); }
-	value_type ParserInt::Div(value_type v1, value_type v2) { return Round(v1) / Round(v2); }
-	value_type ParserInt::Mod(value_type v1, value_type v2) { return Round(v1) % Round(v2); }
-	value_type ParserInt::Shr(value_type v1, value_type v2) { return Round(v1) >> Round(v2); }
-	value_type ParserInt::Shl(value_type v1, value_type v2) { return Round(v1) << Round(v2); }
+	
+	value_type ParserInt::Div(value_type v1, value_type v2) 
+	{
+		int divisor = Round(v2);
+		if (divisor == 0)
+			throw ParserError(ecDIV_BY_ZERO);
+
+		int dividend = Round(v1);
+		if (dividend == INT_MIN && divisor == -1)
+			throw ParserError(ecDOMAIN_ERROR);
+
+		return dividend / divisor;
+	}
+
+	value_type ParserInt::Mod(value_type v1, value_type v2) 
+	{
+		int divisor = Round(v2);
+		if (divisor == 0)
+			throw ParserError(ecDIV_BY_ZERO);
+
+		int dividend = Round(v1);
+		if (dividend == INT_MIN && divisor == -1)
+			throw ParserError(ecDOMAIN_ERROR);
+
+		return dividend % divisor;
+	}
+	
+	value_type ParserInt::Shr(value_type v1, value_type v2) 
+	{
+		int shift = Round(v2);
+		if (shift < 0 || shift >= (int)(sizeof(int) * 8))
+			throw ParserError(ecDOMAIN_ERROR);
+
+		return (int)((unsigned)Round(v1) >> shift);
+	}
+
+	value_type ParserInt::Shl(value_type v1, value_type v2) 
+	{
+		int shift = Round(v2);
+		if (shift < 0 || shift >= (int)(sizeof(int) * 8))
+			throw ParserError(ecDOMAIN_ERROR);
+
+		return (int)((unsigned)Round(v1) << shift);
+	}
+
 	value_type ParserInt::BitAnd(value_type v1, value_type v2) { return Round(v1) & Round(v2); }
 	value_type ParserInt::BitOr(value_type v1, value_type v2) { return Round(v1) | Round(v2); }
 	value_type ParserInt::And(value_type v1, value_type v2) { return Round(v1) && Round(v2); }
@@ -120,6 +161,9 @@ namespace mu
 		std::size_t pos = buf.find_first_not_of(_T("0123456789"));
 
 		if (pos == std::string::npos)
+			pos = buf.length();
+
+		if (pos == 0)
 			return 0;
 
 		stringstream_type stream(buf.substr(0, pos));
@@ -165,7 +209,7 @@ namespace mu
 		nPos = ss.tellg();
 
 		if (nPos == (stringstream_type::pos_type)0)
-			return 1;
+			return 0;
 
 		*a_iPos += (int)(2 + nPos);
 		*a_fVal = (value_type)iVal;

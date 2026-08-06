@@ -5,7 +5,7 @@
    |  Y Y  \  |  /  |_> > __ \|  | \/\___ \\  ___/|  | \/
    |__|_|  /____/|   __(____  /__|  /____  >\___  >__|
 		 \/      |__|       \/           \/     \/
-   Copyright (C) 2004 - 2022 Ingo Berg
+   Copyright (C) 2004 - 2026 Ingo Berg
 
 	Redistribution and use in source and binary forms, with or without modification, are permitted
 	provided that the following conditions are met:
@@ -136,6 +136,12 @@ namespace mu
 				return 123;
 			}
 
+			static value_type StrLen(const char_type* val)
+			{
+				return std::char_traits<char_type>::length(val);
+			}
+
+
 			static value_type StrFun1(const char_type* v1)
 			{
 				int val(0);
@@ -260,7 +266,9 @@ namespace mu
 			int TestOssFuzzTestCases();
 			int TestOptimizer();
 			int TestLocalization();
-			
+			int TestIssue165();
+			int TestIssue168();
+
 			void Abort() const;
 
 		public:
@@ -275,12 +283,14 @@ namespace mu
 
 			// Test Double Parser
 			int EqnTest(const string_type& a_str, double a_fRes, bool a_fPass);
+			int EqnTestStrFun(const string_type& a_str, double a_fRes, bool a_fPass);
 			int EqnTestWithVarChange(const string_type& a_str, double a_fRes1, double a_fVar1,	double a_fRes2,	double a_fVar2);
 			int EqnTestLocalized(const string_type& a_str, double a_fRes);
 			int ThrowTest(const string_type& a_str, int a_iErrc, bool a_bFail = true);
 
 			// Test Int Parser
 			int EqnTestInt(const string_type& a_str, double a_fRes, bool a_fPass);
+			int ThrowTestInt(const string_type& a_str, int a_iErrc, bool a_bFail = true);
 
 			// Test Bulkmode
 			int EqnTestBulk(const string_type& a_str, double a_fRes[4], bool a_fPass);
@@ -295,4 +305,3 @@ namespace mu
 #endif
 
 #endif
-
